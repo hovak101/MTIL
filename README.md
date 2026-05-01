@@ -1,3 +1,7 @@
+## Setup
+
+## Data Collection + Inference Commands
+
 ### find arm port:
 ```bash
 lerobot-find-port
@@ -38,7 +42,7 @@ lerobot-record \
     --dataset.root=data \
     --dataset.repo_id=${HF_USER}/record-test \
     --dataset.num_episodes=50 \
-    --dataset.single_task="Place red ball in beige bowl." \
+    --dataset.single_task="Place red ball in bergundy bowl." \
     --dataset.streaming_encoding=true \
     --dataset.encoder_threads=2 \
     --dataset.vcodec=h264
@@ -49,21 +53,22 @@ lerobot-record \
 rm -rf /home/alex/.cache/huggingface/lerobot/${HF_USER}/record-test
 ```
 
-### run inference: 
+### run inference:
+`lerobot-record` is data-collection only in this version — use `lerobot-rollout` for policy deployment. Sentry strategy continuously runs the policy and records episodes (rotated by video file size, not time).
 ```bash
-lerobot-record \
+lerobot-rollout \
+    --strategy.type=sentry \
+    --policy.path=hovak101/my_mtil_policy \
     --robot.type=so101_follower \
     --robot.port=/dev/serial/by-id/usb-1a86_USB_Single_Serial_5AE7044252-if00 \
     --robot.id=my_follower \
     --robot.cameras="{ top: {type: opencv, index_or_path: /dev/v4l/by-id/usb-046d_HD_Pro_Webcam_C920_F4885D8F-video-index0, width: 640, height: 480, fps: 30, fourcc: MJPG, warmup_s: 5}, front: {type: opencv, index_or_path: /dev/v4l/by-id/usb-Innomaker_Innomaker-U20CAM-1080p-S1_SN0001-video-index0, width: 640, height: 480, fps: 30, fourcc: MJPG, warmup_s: 5}}" \
-    --display_data=true \
-    --dataset.repo_id=${HF_USER}/eval_mtil_record_test \
-    --dataset.num_episodes=10 \
-    --dataset.episode_time_s=30 \
-    --dataset.reset_time_s=15 \
-    --dataset.single_task="Place red ball in beige bowl." \
+    --dataset.repo_id=hovak101/rollout_mtil \
+    --dataset.single_task="Place red ball in bergundy bowl." \
     --dataset.streaming_encoding=true \
     --dataset.encoder_threads=2 \
     --dataset.vcodec=h264 \
-    --policy.path=${HF_USER}/my_mtil_policy
+    --duration=300 \
+    --display_data=true
 ```
+For a quick eval without recording, use `--strategy.type=base` (drop all `--dataset.*` flags) and set `--duration` / `--task`.

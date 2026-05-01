@@ -1,7 +1,8 @@
 # Project-specific
-lerobot/
 outputs/
 data/
+models/
+.claude/
 
 # Python build / install
 __pycache__/
